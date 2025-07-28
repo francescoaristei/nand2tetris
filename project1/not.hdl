@@ -1,0 +1,13 @@
+/*
+ * NAND gives 0 if both input are 1, 1 otherwise.
+ * By feeding a NAND with the input in and 1
+ * If in = 1 then 1 NAND 1 = 0
+ * If in = 0 then 0 NAND 1 = 1
+*/
+
+CHIP Not {
+    IN in;
+    OUT out;
+    PARTS:
+    Nand(a=in, b=1, out=out);
+}

@@ -1,0 +1,26 @@
+/*
+ * Multiplexor is a selector. Has three input, a,b sel. If sel = 0 the output is a, whatever values it has (0 or 1).
+ * If sel = 1 then is b.
+ * The quickiest way to find a solution is just write the canonical representation of it and translate it into chip design.
+*/
+
+CHIP Mux {
+    IN a,b,sel;
+    OUT out;
+    PARTS:
+    Not(in=a, out=nota1);
+    Not(in=b, out=notb1);
+    Not(in=sel, out=notsel1);
+    And(a=nota1, b=b, out=and1);
+    And(a=and1, b=sel, out=and2);
+    And(a=a, b=notb1, out=and3);
+    And(a=and3, b=notsel1, out=and4);
+    Or(a=and2, b=and4, out=or1);
+    Not(in=sel, out=notsel2);
+    And(a=a, b=b, out=and5);
+    And(a=and5, b=notsel2, out=and6);
+    Or(a=or1, b=and6, out=or2);
+    And(a=a, b=b, out=and7);
+    And(a=and7, b=sel, out=and8);
+    Or(a=and8, b=or2, out=out);
+}

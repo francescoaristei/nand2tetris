@@ -1,0 +1,23 @@
+/*
+ * The logic behind it is:
+ * out = a if sel = 00
+ *       b if sel = 01
+ *       c if sel = 10
+ *       d if sel = 11
+ * NOTE: sel[0] is the right-most bit as it is a binary number.
+ * Between a and b the value that decides the output is sel[0].
+ * Between c and d the value that decides the output is sel[0].
+ * Between a,b and c,d the value that decides the output is sel[1].
+ * Meaning, sel[1] decides the output (out1) between a,b and the output between c,d (out2).
+ * sel[0] decides between the out1 and out2.
+*/
+
+CHIP Mux4Way16 {
+    IN a[16], b[16], c[16], d[16], sel[2];
+    OUT out[16];
+    
+    PARTS:
+    Mux16(a=a, b=b, sel=sel[1], out=out1);
+    Mux16(a=c, b=d, sel=sel[1], out=out2);
+    Mux16(a=out1, b=out2, sel=sel[0], out=out);
+}

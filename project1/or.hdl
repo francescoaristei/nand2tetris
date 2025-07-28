@@ -1,0 +1,17 @@
+/*
+* The idea is doing the NOT on both the inputs of the OR
+* and then giving them as input of a NAND:
+* 1 OR 1 = 1 | 0 NAND 0 = 1
+* 1 OR 0 = 1 | 0 NAND 1 = 1
+* 0 OR 1 = 0 | 1 NAND 0 = 1
+* 0 OR 0 = 0 | 1 NAND 1 = 0
+*/
+
+CHIP Or {
+    IN a,b;
+    OUT out;
+    PARTS:
+    Not(in=a, out=nota);
+    Not(in=b, out=notb);
+    Nand(a=nota, b=notb, out=out);
+}

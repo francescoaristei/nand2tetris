@@ -1,0 +1,46 @@
+/**
+ * 4-way demultiplexor:
+ * [a, b, c, d] = [in, 0, 0, 0] if sel = 00
+ *                [0, in, 0, 0] if sel = 01
+ *                [0, 0, in, 0] if sel = 10
+ *                [0, 0, 0, in] if sel = 11
+ * The approach is the same of the dmux.
+ * between a and b the output is determined by sel[0]:
+ * sel[0] = 0 -> a = in, b = 0 and viceversa if sel[0] = 1
+ * Same goes for c and d: between c and d the output is determined by sel[0].
+ * Between the output of a,b and the output of c,d is sel[1]
+ * that decides: sel[1] = 0 -> a or b = in and c = 0, d = 0
+ * if sel[1] = 1 -> a = 0, b = 0 and c or d = in.
+ */
+CHIP DMux4Way {
+    IN in, sel[2];
+    OUT a, b, c, d;
+
+    PARTS:
+    // a and b intermediate
+    Not(in=sel[0], out=notsel01);
+    And(a=true, b=notsel01, out=out1);
+    And(a=true, b=sel[0], out=out2);
+    And(a=in, b=out1, out=out3);
+    And(a=in, b=out2, out=out4);
+
+    // c and d intermediate
+    Not(in=sel[0], out=notsel02);
+    And(a=true, b=notsel02, out=out5);
+    And(a=true, b=sel[0], out=out6);
+    And(a=in, b=out5, out=out7);
+    And(a=in, b=out6, out=out8);
+
+    // a and b final
+    Not(in=sel[1], out=notsel11);
+    And(a=true, b=notsel11, out=out9);
+    And(a=true, b=notsel11, out=out10);
+    And(a=out3, b=out9, out=a);
+    And(a=out4, b=out10, out=b);
+
+    // c and d final
+    And(a=true, b=sel[1], out=out11);
+    And(a=true, b=sel[1], out=out12);
+    And(a=out7, b=out11, out=c);
+    And(a=out8, b=out12, out=d);
+}

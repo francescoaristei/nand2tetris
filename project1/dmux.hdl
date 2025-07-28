@@ -1,0 +1,20 @@
+/*
+ * With the de-multiplexor you have two variables: sel and in.
+ * You also have two inputs (sel, in) and two outputs (a, b).
+ * if sel = 0 then as output a = in, b = 0.
+ * if sel = 1 then as output a = 0, b = in.
+ * If sel = 0 the value of b needs to be enforced as 0 and the that of a as in
+ * and viceversa.
+ * 
+*/
+
+CHIP DMux {
+    IN in,sel;
+    OUT a,b;
+    PARTS:
+    Not(in=sel, out=notsel);
+    And(a=true, b=notsel, out=out1);
+    And(a=true, b=sel, out=out2);
+    And(a=in, b=out1, out=a);
+    And(a=in, b=out2, out=b);
+}
