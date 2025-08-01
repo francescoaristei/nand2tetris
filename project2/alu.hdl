@@ -1,0 +1,71 @@
+/**
+ * ALU (Arithmetic Logic Unit):
+ * Computes out = one of the following functions:
+ *                0, 1, -1,
+ *                x, y, !x, !y, -x, -y,
+ *                x + 1, y + 1, x - 1, y - 1,
+ *                x + y, x - y, y - x,
+ *                x & y, x | y
+ * on the 16-bit inputs x, y,
+ * according to the input bits zx, nx, zy, ny, f, no.
+ * In addition, computes the two output bits:
+ * if (out == 0) zr = 1, else zr = 0
+ * if (out < 0)  ng = 1, else ng = 0
+ */
+// Implementation: Manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) sets x = 0        // 16-bit constant
+// if (nx == 1) sets x = !x       // bitwise not
+// if (zy == 1) sets y = 0        // 16-bit constant
+// if (ny == 1) sets y = !y       // bitwise not
+// if (f == 1)  sets out = x + y  // integer 2's complement addition
+// if (f == 0)  sets out = x & y  // bitwise and
+// if (no == 1) sets out = !out   // bitwise not
+// For zx is possible to apply the zeroing of it, then with a Mux16
+// having sel = zx choose between the two. The result can then be fed into
+// a Not16 to obtain the negation of it and then the result can be fed into a
+// Mux16 together with x and sel = nx to have the final result.
+// The same goes for y.
+// The two outputs both for x and y can be fed into a Adder and a And16
+// The results res can be fed into a Mux16 with sel = f
+// The result can be fed into a Neg16 and finally res and the negation can be fed
+// into a Mux16 with sel = no and the output is the final output of the function selected with the control bits.
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute (out = x + y) or (out = x & y)?
+        no; // negate the out output?
+    OUT 
+        out[16], // 16-bit output
+        zr,      // if (out == 0) equals 1, else 0
+        ng;      // if (out < 0)  equals 1, else 0
+
+    PARTS:
+    // x
+    Mux16(a=x,b=false,sel=zx,out=xzeroed);
+    Not16(in=xzeroed, out=notx);
+    Mux16(a=xzeroed, b=notx, sel=nx, out=outx);
+
+    // y
+    Mux16(a=y,b=false,sel=zy,out=yzeroed);
+    Not16(in=yzeroed, out=noty);
+    Mux16(a=yzeroed, b=noty, sel=ny, out=outy);
+
+    // f
+    Add16(a=outx, b=outy, out=outxpy);
+    And16(a=outx, b=outy, out=outxandy);
+    Mux16(a=outxandy, b=outxpy, sel=f, out=outf);
+
+    // no / out
+    Not16(in=outf, out=outfno);
+    Mux16(a=outf,b=outfno,sel=no,out=out,out[0..7]=zr1,out[8..15]=zr2,out[15]=ng);
+    Or8Way(in=zr1, out=zr1reduced);
+    Or8Way(in=zr2, out=zr2reduced);
+    Or(a=zr1reduced, b=zr2reduced, out=notzr);
+    Not(in=notzr, out=zr);
+}

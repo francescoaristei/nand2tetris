@@ -1,0 +1,25 @@
+/*
+* The logic is that, if either a, b or c is 1 then sum = 1
+* while in order to have carry = 1 two between a,b and c needs to be 1.
+* Therefore the logic is to take the result of the sum between a and b
+* using the XOR as in the half-adder and feed it with c in a second XOR.
+* For the carry either two between a, b and c needs to be 1 or all of them.
+* Doing the AND between each possible pair and then ORing in sequence the results
+* will tell if there two or more between a,b and c which are 1.
+*
+*/
+
+CHIP FullAdder {
+    IN a, b, c;  // 1-bit inputs
+    OUT sum,     // Right bit of a + b + c
+        carry;   // Left bit of a + b + c
+
+    PARTS:
+    Xor(a=a, b=b, out=out1);
+    Xor(a=out1, b=c, out=sum);
+    And(a=a, b=b, out=outab);
+    And(a=a, b=c, out=outac);
+    And(a=b, b=c, out=outbc);
+    Or(a=outab, b=outac, out=out2);
+    Or(a=outbc, b=out2, out=carry);
+}
