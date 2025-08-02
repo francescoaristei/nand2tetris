@@ -1,0 +1,28 @@
+/**
+ * A 16-bit counter.
+ * if      reset(t): out(t+1) = 0
+ * else if load(t):  out(t+1) = in(t)
+ * else if inc(t):   out(t+1) = out(t) + 1
+ * else              out(t+1) = out(t)
+ * The key to understand is that you need to enforce
+ * a clocking on the combinational chips used to perform
+ * inc, loading and resetting.
+ * To do so, the best way is to feed as input of the combinational chips
+ * the output of the register and to have as output of the whole chip the output
+ * of the register, so that it is coherent with the clock.
+ * Moreover, second thing to notice is that the "higher priority" if is the reset one,
+ * followed by the load etc. Meaning, if reset=1 does not matter of the others, this has to be executed
+ * in the logic of the chip this translates in being "closer" to the input of the register.
+ */
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+    
+    PARTS:
+    Inc16(in=out5, out=outinc);
+    Mux16(a=out5, b=outinc, sel=inc, out=out4);
+    Mux16(a=out4, b=in, sel=load, out=out3);
+    Mux16(a=out3, b=false, sel=reset, out=out2);
+    Register(in=out2, load=true, out=out5);
+    And16(a=out5, b=true, out=out);
+}

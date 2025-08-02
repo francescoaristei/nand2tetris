@@ -1,0 +1,76 @@
+/**
+ * 16-bit register:
+ * If load is asserted, the register's value is set to in;
+ * Otherwise, the register maintains its current value:
+ * if (load(t)) out(t+1) = int(t), else out(t+1) = out(t)
+ * A register is simply a parallelization of the previously defined single bit register.
+ */
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+    Mux(a=outdff0, b=in[0], sel=load, out=dffin0);
+    DFF(in=dffin0, out=outdff0);
+    And(a=outdff0, b=true, out=out[0]);
+
+    Mux(a=outdff1, b=in[1], sel=load, out=dffin1);
+    DFF(in=dffin1, out=outdff1);
+    And(a=outdff1, b=true, out=out[1]);
+
+    Mux(a=outdff2, b=in[2], sel=load, out=dffin2);
+    DFF(in=dffin2, out=outdff2);
+    And(a=outdff2, b=true, out=out[2]);
+
+    Mux(a=outdff3, b=in[3], sel=load, out=dffin3);
+    DFF(in=dffin3, out=outdff3);
+    And(a=outdff3, b=true, out=out[3]);
+
+    Mux(a=outdff4, b=in[4], sel=load, out=dffin4);
+    DFF(in=dffin4, out=outdff4);
+    And(a=outdff4, b=true, out=out[4]);
+
+    Mux(a=outdff5, b=in[5], sel=load, out=dffin5);
+    DFF(in=dffin5, out=outdff5);
+    And(a=outdff5, b=true, out=out[5]);
+
+    Mux(a=outdff6, b=in[6], sel=load, out=dffin6);
+    DFF(in=dffin6, out=outdff6);
+    And(a=outdff6, b=true, out=out[6]);
+
+    Mux(a=outdff7, b=in[7], sel=load, out=dffin7);
+    DFF(in=dffin7, out=outdff7);
+    And(a=outdff7, b=true, out=out[7]);
+
+    Mux(a=outdff8, b=in[8], sel=load, out=dffin8);
+    DFF(in=dffin8, out=outdff8);
+    And(a=outdff8, b=true, out=out[8]);
+
+    Mux(a=outdff9, b=in[9], sel=load, out=dffin9);
+    DFF(in=dffin9, out=outdff9);
+    And(a=outdff9, b=true, out=out[9]);
+
+    Mux(a=outdff10, b=in[10], sel=load, out=dffin10);
+    DFF(in=dffin10, out=outdff10);
+    And(a=outdff10, b=true, out=out[10]);
+
+    Mux(a=outdff11, b=in[11], sel=load, out=dffin11);
+    DFF(in=dffin11, out=outdff11);
+    And(a=outdff11, b=true, out=out[11]);
+
+    Mux(a=outdff12, b=in[12], sel=load, out=dffin12);
+    DFF(in=dffin12, out=outdff12);
+    And(a=outdff12, b=true, out=out[12]);
+
+    Mux(a=outdff13, b=in[13], sel=load, out=dffin13);
+    DFF(in=dffin13, out=outdff13);
+    And(a=outdff13, b=true, out=out[13]);
+
+    Mux(a=outdff14, b=in[14], sel=load, out=dffin14);
+    DFF(in=dffin14, out=outdff14);
+    And(a=outdff14, b=true, out=out[14]);
+
+    Mux(a=outdff15, b=in[15], sel=load, out=dffin15);
+    DFF(in=dffin15, out=outdff15);
+    And(a=outdff15, b=true, out=out[15]);
+}

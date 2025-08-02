@@ -1,0 +1,26 @@
+/**
+ * 1-bit register:
+ * If load is asserted, the register's value is set to in;
+ * Otherwise, the register maintains its current value:
+ * if (load(t)) out(t+1) = in(t), else out(t+1) = out(t)
+ *
+ * A mux is used to distinguish between keeping in the chip
+ * the already stored value, or loading a new one (in) depending
+ * on the value of load.
+ * To keep storing the same value, a chip that is able to remember
+ * the previous state is needed.
+ * The DFF is capable of it. It gives as output at time t, the input at
+ * time t - 1.
+ * So, the key is to feed in the Mux the output of the DFF.
+ * Therefore the output of the DFF will either be the new "in" or the value
+ * that was in output at the clock before.
+ */
+CHIP Bit {
+    IN in, load;
+    OUT out;
+
+    PARTS:
+    Mux(a=outdff, b=in, sel=load, out=dffin);
+    DFF(in=dffin, out=outdff);
+    And(a=outdff, b=true, out=out);
+}

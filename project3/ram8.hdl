@@ -1,0 +1,31 @@
+/**
+ * Memory of eight 16-bit registers.
+ * If load is asserted, the value of the register selected by
+ * address is set to in; Otherwise, the value does not change.
+ * The value of the selected register is emitted by out.
+ * The register whose address is selected, depending on the value of load
+ * will either be updated with the new input "in" or keep the same value
+ * then such register, given that has been addressed by address gives the result
+ * as output of the RAM.
+ * This can be achived by first setting the load(s) bits for each register correctly
+ * depending on the value of address: a non-selected register will continue keeping its value (load=0)
+ * for the selected one it depends (if load = 1 or 0).
+ * Then the value of the selected register is given as output, and a Mux8Way16 is the right chip for it.
+ */
+CHIP RAM8 {
+    IN in[16], load, address[3];
+    OUT out[16];
+
+    PARTS:
+    DMux8Way(in=load, sel=address, a=r0, b=r1, c=r2, d=r3, e=r4, f=r5, g=r6, h=r7);
+    Register(in=in, load=r0, out=out0);
+    Register(in=in, load=r1, out=out1);
+    Register(in=in, load=r2, out=out2);
+    Register(in=in, load=r3, out=out3);
+    Register(in=in, load=r4, out=out4);
+    Register(in=in, load=r5, out=out5);
+    Register(in=in, load=r6, out=out6);
+    Register(in=in, load=r7, out=out7);
+
+    Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7, sel=address, out=out);
+}
