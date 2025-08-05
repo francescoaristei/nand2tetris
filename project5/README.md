@@ -92,9 +92,9 @@ The overall functioning of the Hack machine is in these two operations:
 
 This particular fetch-execute cycle implies that in the Hack platform, elementary operations involving memory access usually require two instructions: an address instruction to set the A register to a particular address, and a subsequent compute instruction that operates on this address (a read/write operation on theRAM or a jump operation into the ROM).
 
-The overall architecture of the Hack machine is the following.
+#### Memory
 
-First the memory.
+The Memory chip of the Hack platform is essentially a package of three lower-level chips: RAM16K, Screen, and Keyboard. 
 
 ```
                           load
@@ -111,12 +111,25 @@ addr -/15-> | |          Screen Memory Map    | | -------> screen
             +-------------------------------+---+
 ```
 
-Then the CPU:
+#### CPU
 
-![CPU Diagram](hack-cpu.png)
+The CPU implementation objective is to create a logic gate architecture capable of executing a given Hack instruction and fetching the next instruction to be executed. The CPU will include an ALU capable of executing Hack instructions, a set of registers, and some control logic designed to fetch and decode instructions.
 
-The overall architecture of the Hack Machine is the following:
 
-![Hack Machine](hack-machine.png)
+<img src="imgs/hack-cpu.png" alt="CPU Diagram" style="width:45%; display:block;" />
 
+
+#### Hack Machine Architecture
+
+<img src="imgs/hack-machine.png" alt="CPU Diagram" style="width:45%; display:block;" />
+
+##### Limits
+
+Unlike Hack, most general-purpose computers use a single address space for storing both data and instructions. In such architectures, the instruction address as well as the optional data address specified by the instruction must be fed into the same destination: the single address input of the shared address space. Clearly, this cannot be done at the same time. The standard solution is to base the computer implementation on a two-cycle logic. 
+- During the fetch cycle, the instruction address is fed to the address input of the memory, causing it to immediately emit the current instruction, which is then stored in an instruction register.
+- In the subsequent execute cycle, the instruction is decoded, and the optional data address inferred from it is fed to the memory’s address input, allowing the instruction to manipulate the selected memory location. 
+
+In contrast, the Hack architecture is unique in that it partitions the address space into two separate parts, allowing a single-cycle fetch-execute logic. The price of this simpler hardware design is that programs cannot be changed dynamically.
+
+In terms of I/O, the Hack keyboard and screen are rather simple. General-purpose computers are typically connected to multiple I/O devices like printers, disks, network connections, and so on. Also, typical screens are obviously much more powerful than the Hack screen.
 
