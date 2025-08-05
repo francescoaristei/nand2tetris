@@ -111,4 +111,12 @@ addr -/15-> | |          Screen Memory Map    | | -------> screen
             +-------------------------------+---+
 ```
 
+Then the CPU:
+
+![CPU Diagram](hack-cpu.png)
+
+The overall architecture of the Hack Machine is the following:
+
+![Hack Machine](hack-machine.png)
+
 
