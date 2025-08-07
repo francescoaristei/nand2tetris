@@ -113,7 +113,7 @@ addr -/15-> | |          Screen Memory Map    | | -------> screen
 
 #### CPU
 
-The CPU implementation objective is to create a logic gate architecture capable of executing a given Hack instruction and fetching the next instruction to be executed. The CPU will include an ALU capable of executing Hack instructions, a set of registers, and some control logic designed to fetch and decode instructions.
+The CPU implementation objective is to create a logic gate architecture capable of executing a given Hack instruction and fetching the next instruction to be executed. The CPU will include an ALU capable of executing Hack instructions, a set of registers, and some control logic designed to fetch and decode instructions. The following architecture miss the control logic.
 
 
 <img src="imgs/hack-cpu.png" alt="CPU Diagram" style="width:45%; display:block;" />

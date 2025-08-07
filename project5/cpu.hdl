@@ -1,0 +1,62 @@
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ *
+ * By looking at the proposed architecture and remembering what each instruction (A, C) do and the bits involved is possible to define
+ * the necessary hdl.
+ *
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+    // if a bit = 0 A instruction (load A register with instruction bits) else
+    // load A register with output of ALU to store it
+    Mux16(a=instruction[0..14], b=outalu, sel=instruction[15], out=ainput);
+
+    // A register
+    Register(in=ainput, load=instruction[5], out=outa);
+
+    // a bit of the instruction tells wether the ALU operates on A register or memory input
+    Mux16(a=outa, b=inM, sel=instruction[12], out=outam);
+
+    // addressM
+    And16(a=outa, b=true, out=addressM);
+
+    // write to M
+    And(a=instruction[3], b=true, out=writeM);
+
+    // D register
+    Register(in=outalu, load=instruction[4], out=outd);
+
+    // ALU
+    ALU(x=outd, y=outam, zx=instruction[6], nx=instruction[7], zy=instruction[8], ny=instruction[9], f=instruction[10], no=instruction[11], out=outalu);
+    And16(a=outalu, b=true, out=outM);
+
+    // ONLY PART MISSING
+    PC(in=outA, reset=reset, load= int= out=);
+	
+}
