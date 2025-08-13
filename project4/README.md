@@ -148,7 +148,7 @@ The other two 1's are left as is.
 is the default.
     - The computer should fetch and execute an instruction located elsewhere in the program
         - We assume that the A register has been previously set to the address to which we have to jump.
-    - The first j-bit specifies whether to jump in case this value is negative, the second j-bit in case the value is zero, and the third j-bit in case it is positive.
+    - The first j-bit specifies whether to jump in case this value (output of the ALU) is negative, the second j-bit in case the value is zero, and the third j-bit in case it is positive.
         - More can be set at the same time (>= or <=).
         - If they are all 1 then an unconditional jump is performed.
 

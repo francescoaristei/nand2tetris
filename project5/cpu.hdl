@@ -14,6 +14,7 @@
  * clocked: although they are affected by the instruction's execution, they commit to
  * their new values only in the next cycle.
  *
+ * The instruction format is the following: i xx a cccccc ddd jjj
  * By looking at the proposed architecture and remembering what each instruction (A, C) do and the bits involved is possible to define
  * the necessary hdl.
  *
@@ -33,30 +34,83 @@ CHIP CPU {
 
     PARTS:
 
-    // if a bit = 0 A instruction (load A register with instruction bits) else
+    // if C instruction (i=0) look at the bit meaning:
+    // if instruction[5] = 1 load in A else not
+    // if A instruction (i=0) don't look at bit meaning
+    And(a=instruction[15], b=instruction[5], out=loadina);
+
+
+    // if i bit = 0 A instruction (load A register with instruction bits) else
     // load A register with output of ALU to store it
-    Mux16(a=instruction[0..14], b=outalu, sel=instruction[15], out=ainput);
+    Mux16(a=instruction, b=outalu, sel=loadina, out=ainput);
+
+
+    // a bit
+    And(a=instruction[15], b=instruction[12], out=is12);
+
+    // write m
+    And(a=instruction[15], b=instruction[3], out=is3);
+
+    // d bit
+    And(a=instruction[15], b=instruction[4], out=is4);
+
+    // alu bits
+    And(a=instruction[15], b=instruction[6], out=is6);
+    And(a=instruction[15], b=instruction[7], out=is7);
+    And(a=instruction[15], b=instruction[8], out=is8);
+    And(a=instruction[15], b=instruction[9], out=is9);
+    And(a=instruction[15], b=instruction[10], out=is10);
+    And(a=instruction[15], b=instruction[11], out=is11);
+
+    // jump bits
+    And(a=instruction[15], b=instruction[0], out=is0);
+    And(a=instruction[15], b=instruction[1], out=is1);
+    And(a=instruction[15], b=instruction[2], out=is2);
+    
 
     // A register
-    Register(in=ainput, load=instruction[5], out=outa);
+    // if A instruction (i=0) load in A instruction
+    // else
+    // if instruction[5] = 0 don't load ALU output keep same value
+    // else load ALU output
+
+    // if is A instruction load input which is instruction
+    // if is C instruction and instruction[5] = 1, load ALU output
+    // only if is C instruction with instruction[5] = 0, no load
+    Not(in=instruction[15], out=isA);
+    Or(a=isA, b=loadina, out=AorMaybeAlu);
+
+    ARegister(in=ainput, load=AorMaybeAlu, out=outa, out[0..14]=addressM);
 
     // a bit of the instruction tells wether the ALU operates on A register or memory input
     Mux16(a=outa, b=inM, sel=instruction[12], out=outam);
 
-    // addressM
-    And16(a=outa, b=true, out=addressM);
-
     // write to M
-    And(a=instruction[3], b=true, out=writeM);
-
-    // D register
-    Register(in=outalu, load=instruction[4], out=outd);
+    And(a=is3, b=true, out=writeM);
 
     // ALU
-    ALU(x=outd, y=outam, zx=instruction[6], nx=instruction[7], zy=instruction[8], ny=instruction[9], f=instruction[10], no=instruction[11], out=outalu);
-    And16(a=outalu, b=true, out=outM);
+    ALU(x=outd, y=outam, zx=is11, nx=is10, zy=is9, ny=is8, f=is7, no=is6, out=outM, out=outalu, zr=zr, ng=ng);
 
-    // ONLY PART MISSING
-    PC(in=outA, reset=reset, load= int= out=);
+    // D register
+    DRegister(in=outalu, load=is4, out=outd);
+
+
+    // logic for jump/next instruction
+    And(a=ng, b=is2, out=jnegative);
+    And(a=zr, b=is1, out=jzero);
+    Or(a=jnegative, b=jzero, out=jnegzero);
+
+    Not(in=ng, out=notnegative);
+    Not(in=zr, out=notzero);
+    And(a=notnegative, b=notzero, out=notnegzero);
+    And(a=notnegzero, b=is0, out=jpositive);
+
+    Or(a=jnegzero, b=jpositive, out=jump);
+    Not(in=jump, out=notjump);
+
+
+    // program counter
+    PC(in=outa, reset=reset, load=jump, inc=notjump, out[0..14]=pc);
 	
 }
+
